@@ -28,7 +28,9 @@ pub enum GameState {
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_state::<GameState>()
+    .add_state::<GameState>()
+    // Global input configuration resource used for constructing input maps and runtime remapping
+    .insert_resource(movement::InputConfig::default())
         // Physics
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugins(RapierDebugRenderPlugin::default())

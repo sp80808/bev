@@ -1,14 +1,17 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
+use rand::Rng;
 
 use crate::{ 
     components::Health,
     enemy::Enemy,
-    experience::{spawn_experience_gem, ExperienceGem},
+    experience::spawn_experience_gem,
+    loot::spawn_loot_drop,
     weapon::Projectile,
 };
 
 const PROJECTILE_DAMAGE: f32 = 10.0;
+const LOOT_DROP_CHANCE: f32 = 0.3; // 30%
 
 pub struct CombatPlugin;
 
@@ -52,10 +55,17 @@ fn check_death(
     mut commands: Commands,
     query: Query<(Entity, &Transform, &Health), With<Enemy>>,
 ) {
+    let mut rng = rand::thread_rng();
     for (entity, transform, health) in query.iter() {
         if health.value <= 0.0 {
             commands.entity(entity).despawn();
-            spawn_experience_gem(&mut commands, transform.translation.truncate());
+            let position = transform.translation.truncate();
+
+            if rng.gen_range(0.0..1.0) < LOOT_DROP_CHANCE {
+                spawn_loot_drop(&mut commands, position);
+            } else {
+                spawn_experience_gem(&mut commands, position);
+            }
         }
     }
 }

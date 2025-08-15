@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use rand::Rng;
 
-use crate::{player::Player, combat::Health};
+use crate::{components::Health, player::Player};
 
 const ENEMY_SPAWN_TIME: f32 = 0.5;
 const ENEMY_SPEED: f32 = 200.0;

@@ -1,0 +1,10 @@
+[package]
+name = "bev"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = "0.14"
+leafwing-input-manager = "0.10"
+bevy_rapier2d = { version = "0.26.0", features = [ "simd-stable" ] }
+rand = "0.8"

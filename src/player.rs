@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use leafwing_input_manager::prelude::{Actionlike, InputMap};
+use leafwing_input_manager::prelude::controller::GamepadButtonType;
 
 use crate::{
     components::Health,
@@ -39,6 +40,14 @@ fn setup_player(mut commands: Commands) {
     input_map.insert(KeyCode::ArrowLeft, Action::MoveLeft);
     input_map.insert(KeyCode::KeyD, Action::MoveRight);
     input_map.insert(KeyCode::ArrowRight, Action::MoveRight);
+    // Keyboard shortcuts for abilities
+    input_map.insert(KeyCode::KeyJ, Action::Ability1);
+    input_map.insert(KeyCode::KeyK, Action::Ability2);
+    input_map.insert(KeyCode::KeyL, Action::Ability3);
+    // Map common gamepad face buttons to abilities (South=A, East=B, North=Y on many controllers)
+    input_map.insert(GamepadButtonType::South, Action::Ability1);
+    input_map.insert(GamepadButtonType::East, Action::Ability2);
+    input_map.insert(GamepadButtonType::North, Action::Ability3);
 
     let weapon_entity = spawn_orbital_weapon(&mut commands);
 

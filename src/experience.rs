@@ -15,6 +15,9 @@ pub struct PlayerStats {
     pub level: u32,
     pub experience: u32,
     pub xp_to_next_level: u32,
+    pub damage_multiplier: f32,
+    pub speed_multiplier: f32,
+    pub orbital_count: u32,
 }
 
 impl Default for PlayerStats {
@@ -23,6 +26,9 @@ impl Default for PlayerStats {
             level: 1,
             experience: 0,
             xp_to_next_level: INITIAL_XP_TO_NEXT_LEVEL,
+            damage_multiplier: 1.0,
+            speed_multiplier: 1.0,
+            orbital_count: 1,
         }
     }
 }

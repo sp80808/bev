@@ -9,6 +9,7 @@ mod experience;
 mod loot;
 mod movement;
 mod player;
+mod ui;
 mod weapon;
 
 use combat::CombatPlugin;
@@ -17,6 +18,7 @@ use experience::ExperiencePlugin;
 use loot::LootPlugin;
 use movement::MovementPlugin;
 use player::PlayerPlugin;
+use ui::UiPlugin;
 use weapon::WeaponPlugin;
 
 // Central game states for the project.
@@ -30,9 +32,9 @@ pub enum GameState {
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-    .add_state::<GameState>()
-    // Global input configuration resource used for constructing input maps and runtime remapping
-    .insert_resource(movement::InputConfig::default())
+        .add_state::<GameState>()
+        // Global input configuration resource used for constructing input maps and runtime remapping
+        .insert_resource(movement::InputConfig::default())
         // Physics
         .add_plugins(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
         .add_plugins(RapierDebugRenderPlugin::default())
@@ -47,6 +49,7 @@ fn main() {
             CombatPlugin,
             ExperiencePlugin,
             LootPlugin,
+            UiPlugin,
         ))
         .run();
 }

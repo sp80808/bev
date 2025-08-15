@@ -16,6 +16,10 @@ pub enum Action {
     MoveDown,
     MoveLeft,
     MoveRight,
+    // Mapped to gamepad face buttons or keyboard shortcuts for abilities
+    Ability1,
+    Ability2,
+    Ability3,
 }
 
 /// Input configuration resource holds default key and gamepad bindings and
@@ -129,6 +133,9 @@ fn debug_ui_update_system(
         lines.push(format!("MoveDown: {}", action_state.pressed(Action::MoveDown)));
         lines.push(format!("MoveLeft: {}", action_state.pressed(Action::MoveLeft)));
         lines.push(format!("MoveRight: {}", action_state.pressed(Action::MoveRight)));
+    lines.push(format!("Ability1: {}", action_state.pressed(Action::Ability1)));
+    lines.push(format!("Ability2: {}", action_state.pressed(Action::Ability2)));
+    lines.push(format!("Ability3: {}", action_state.pressed(Action::Ability3)));
     }
 
     if let Some(gp) = gamepads.iter().next() {

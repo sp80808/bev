@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::input::gamepad::{GamepadAxis, GamepadAxisType};
 use leafwing_input_manager::prelude::{Actionlike, ActionState};
 
 use crate::player::Player;

@@ -4,7 +4,7 @@ use leafwing_input_manager::prelude::{Actionlike, InputMap};
 
 use crate::{
     components::Health,
-    movement::{Action, Velocity},
+    movement::{Action, Velocity, DebugUi, InputConfig},
     weapon::spawn_orbital_weapon,
 };
 
@@ -68,4 +68,14 @@ fn setup_player(mut commands: Commands) {
             ActiveEvents::COLLISION_EVENTS,
         ))
         .add_child(weapon_entity);
+
+    // Spawn a simple debug UI text in the top-left that will be updated each frame.
+    let font = AssetServer::load("fonts/FiraSans-Bold.ttf");
+    commands
+        .spawn(TextBundle::from_sections([
+            TextSection::new("", TextStyle { font: font.clone(), font_size: 16.0, color: Color::WHITE }),
+        ]))
+        .insert(Transform::from_translation(Vec3::new(-380.0, 220.0, 0.0)))
+        .insert(GlobalTransform::default())
+        .insert(DebugUi);
 }

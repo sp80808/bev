@@ -113,7 +113,7 @@ fn apply_velocity_system(time: Res<Time>, mut query: Query<(&Velocity, &mut Tran
 /// Simple debug UI: we spawn a TextBundle with a marker and update it each frame to
 /// show which actions are active and (if present) the first gamepad axes.
 #[derive(Component)]
-struct DebugUi;
+pub struct DebugUi;
 
 fn debug_ui_update_system(
     action_states: Query<&ActionState<Action>, With<Player>>,
@@ -136,8 +136,13 @@ fn debug_ui_update_system(
         lines.push(format!("Gamepad LStick: x={:.2}, y={:.2}", x, y));
     }
 
-    let text = lines.join("\n");
+    let text_value = lines.join("\n");
     for mut text in query.iter_mut() {
-        text.sections[0].value = text.clone();
+        if !text.sections.is_empty() {
+            text.sections[0].value = text_value.clone();
+        } else {
+            // Fallback: ensure there's at least one section
+            text.sections.push(TextSection::new(text_value.clone(), TextStyle::default()));
+        }
     }
 }

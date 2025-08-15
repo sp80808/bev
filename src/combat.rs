@@ -5,7 +5,7 @@ use rand::Rng;
 use crate::{ 
     components::Health,
     enemy::Enemy,
-    experience::spawn_experience_gem,
+    experience::{spawn_experience_gem, PlayerStats},
     loot::spawn_loot_drop,
     weapon::Projectile,
 };
@@ -31,6 +31,7 @@ fn handle_collisions(
     mut collision_events: EventReader<CollisionEvent>,
     mut enemy_query: Query<&mut Health, With<Enemy>>,
     projectile_query: Query<Entity, With<Projectile>>,
+    player_stats: Res<PlayerStats>,
 ) {
     for event in collision_events.read() {
         if let CollisionEvent::Started(entity1, entity2, _) = event {
@@ -45,7 +46,7 @@ fn handle_collisions(
                 };
 
             if let Ok(mut health) = enemy_query.get_mut(enemy_entity) {
-                health.value -= PROJECTILE_DAMAGE;
+                health.value -= PROJECTILE_DAMAGE * player_stats.damage_multiplier;
             }
         }
     }

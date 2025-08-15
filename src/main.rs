@@ -6,6 +6,7 @@ mod combat;
 mod components;
 mod enemy;
 mod experience;
+mod loot;
 mod movement;
 mod player;
 mod weapon;
@@ -13,6 +14,7 @@ mod weapon;
 use combat::CombatPlugin;
 use enemy::EnemyPlugin;
 use experience::ExperiencePlugin;
+use loot::LootPlugin;
 use movement::MovementPlugin;
 use player::PlayerPlugin;
 use weapon::WeaponPlugin;
@@ -44,6 +46,7 @@ fn main() {
             WeaponPlugin,
             CombatPlugin,
             ExperiencePlugin,
+            LootPlugin,
         ))
         .run();
 }

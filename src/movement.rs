@@ -17,23 +17,58 @@ pub enum Action {
     MoveRight,
 }
 
+/// Input configuration resource holds default key and gamepad bindings and
+/// can be mutated at runtime to support remapping. We keep it small for now.
+#[derive(Resource, Debug, Clone)]
+pub struct InputConfig {
+    // Deadzone for gamepad axis inputs
+    pub gamepad_deadzone: f32,
+}
+
+impl Default for InputConfig {
+    fn default() -> Self {
+        InputConfig {
+            gamepad_deadzone: 0.2,
+        }
+    }
+}
+
 pub struct MovementPlugin;
 
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
         // Update stage systems: one to read input and set velocity, one to apply it.
         app.add_systems(Update, player_movement_system)
-            .add_systems(Update, apply_velocity_system);
+            .add_systems(Update, apply_velocity_system)
+            .add_systems(Update, debug_ui_update_system);
     }
 }
 
-/// Read input from `ActionState<Action>` and update the player's `Velocity`.
+/// Read input from `ActionState<Action>` and gamepad axes to update the player's `Velocity`.
 fn player_movement_system(
     action_states: Query<&ActionState<Action>, With<Player>>,
+    gamepads: Res<Gamepads>,
+    axes: Res<Axis<GamepadAxis>>,
+    input_cfg: Res<InputConfig>,
     mut query: Query<&mut Velocity, With<Player>>,
 ) {
     // Movement speed in units per second.
     const SPEED: f32 = 200.0;
+
+    // Build a gamepad axis vector if a gamepad is connected (uses first gamepad)
+    let mut gp_dir = Vec2::ZERO;
+    if let Some(gp) = gamepads.iter().next() {
+        // Typical mapping: left stick is GamepadAxis::LeftStickX / LeftStickY
+        let x = axes.get(GamepadAxis(*gp, GamepadAxisType::LeftStickX)).unwrap_or(0.0);
+        let y = axes.get(GamepadAxis(*gp, GamepadAxisType::LeftStickY)).unwrap_or(0.0);
+        // In many gamepad APIs, up is negative Y; invert for consistent +Y=up
+        gp_dir = Vec2::new(x, -y);
+        if gp_dir.length() < input_cfg.gamepad_deadzone {
+            gp_dir = Vec2::ZERO;
+        } else if gp_dir.length_squared() > 0.0 {
+            gp_dir = gp_dir.normalize();
+        }
+    }
 
     for action_state in action_states.iter() {
         let mut dir = Vec2::ZERO;
@@ -48,6 +83,11 @@ fn player_movement_system(
         }
         if action_state.pressed(Action::MoveRight) {
             dir.x += 1.0;
+        }
+
+        // Combine keyboard/action input with gamepad input. Gamepad has priority if present.
+        if gp_dir.length_squared() > 0.0 {
+            dir = gp_dir;
         }
 
         // Normalize to avoid faster diagonal movement.
@@ -67,5 +107,37 @@ fn apply_velocity_system(time: Res<Time>, mut query: Query<(&Velocity, &mut Tran
     for (vel, mut transform) in query.iter_mut() {
         transform.translation.x += vel.0.x * delta;
         transform.translation.y += vel.0.y * delta;
+    }
+}
+
+/// Simple debug UI: we spawn a TextBundle with a marker and update it each frame to
+/// show which actions are active and (if present) the first gamepad axes.
+#[derive(Component)]
+struct DebugUi;
+
+fn debug_ui_update_system(
+    action_states: Query<&ActionState<Action>, With<Player>>,
+    gamepads: Res<Gamepads>,
+    axes: Res<Axis<GamepadAxis>>,
+    mut query: Query<&mut Text, With<DebugUi>>,
+) {
+    let mut lines = Vec::new();
+
+    if let Some(action_state) = action_states.iter().next() {
+        lines.push(format!("MoveUp: {}", action_state.pressed(Action::MoveUp)));
+        lines.push(format!("MoveDown: {}", action_state.pressed(Action::MoveDown)));
+        lines.push(format!("MoveLeft: {}", action_state.pressed(Action::MoveLeft)));
+        lines.push(format!("MoveRight: {}", action_state.pressed(Action::MoveRight)));
+    }
+
+    if let Some(gp) = gamepads.iter().next() {
+        let x = axes.get(GamepadAxis(*gp, GamepadAxisType::LeftStickX)).unwrap_or(0.0);
+        let y = axes.get(GamepadAxis(*gp, GamepadAxisType::LeftStickY)).unwrap_or(0.0);
+        lines.push(format!("Gamepad LStick: x={:.2}, y={:.2}", x, y));
+    }
+
+    let text = lines.join("\n");
+    for mut text in query.iter_mut() {
+        text.sections[0].value = text.clone();
     }
 }

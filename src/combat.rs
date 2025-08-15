@@ -1,18 +1,14 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-use crate::{
+use crate::{ 
+    components::Health,
     enemy::Enemy,
-    experience::{ExperienceGem, spawn_experience_gem},
+    experience::{spawn_experience_gem, ExperienceGem},
     weapon::Projectile,
 };
 
 const PROJECTILE_DAMAGE: f32 = 10.0;
-
-#[derive(Component, Debug)]
-pub struct Health {
-    pub value: f32,
-}
 
 pub struct CombatPlugin;
 
